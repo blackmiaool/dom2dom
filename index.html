@@ -95,7 +95,9 @@
     <script src="./index.js"></script>
     <script>
         const $=document.querySelector.bind(document);
-        fdtd($("#button"),$("input"));
+        // new Fdtd({from:$("#button"),to:$("#input")});
+        new Fdtd({from:$("#input"),to:$("#link")});
+        // new Fdtd({from:$("#button"),to:$("#link")});
     </script>
 </body>
 
