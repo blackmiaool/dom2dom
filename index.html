@@ -76,7 +76,7 @@
 <body>
     <div class="column left">
         <div class="fill-top"></div>
-        <button id="button">A Button</button>
+        <button id="button" style="height:150px;">A Button</button>
         <div class="fill-bottom"></div>
     </div>
     <div class="column center">
@@ -95,9 +95,9 @@
     <script src="./index.js"></script>
     <script>
         const $=document.querySelector.bind(document);
-        // new Fdtd({from:$("#button"),to:$("#input")});
+        new Fdtd({from:$("#button"),to:$("#input")});
         new Fdtd({from:$("#input"),to:$("#link")});
-        // new Fdtd({from:$("#button"),to:$("#link")});
+        new Fdtd({from:$("#button"),to:$("#link")});
     </script>
 </body>
 

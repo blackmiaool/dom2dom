@@ -1,11 +1,15 @@
-function sumSqrt(a,b){
-    return Math.sqrt(a*a+b*b);
+function sumSqrt(a, b) {
+    return Math.sqrt(a * a + b * b);
 }
-function getBoundingRect(dom){
-    const rect=dom.getBoundingClientRect();
-    rect.x+=rect.width/2;
-    rect.y+=rect.height/2;
+function getBoundingRect(dom) {
+    const rect = dom.getBoundingClientRect();
+    rect.x += rect.width / 2;
+    rect.y += rect.height / 2;
     return rect;
+}
+function makeBias(pos, len, angle) {
+    pos.x += len * Math.cos(angle);
+    pos.y += len * Math.sin(angle);
 }
 class Fdtd {
     constructor({ from, to }) {
@@ -20,13 +24,13 @@ class Fdtd {
         this.to = to;
         function sumSqrt(a, b) {
             return Math.sqrt(a * a + b * b);
-        }        
-        
+        }
+
         this.canvas = canvas;
         this.ctx = ctx;
         this.update();
     }
-    update(){
+    update() {
         this.draw();
         requestAnimationFrame(this.update.bind(this));
     }
@@ -44,28 +48,39 @@ class Fdtd {
         canvas.height = document.documentElement.offsetHeight;
         canvas.width = document.documentElement.offsetWidth;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        function makeBias(pos,len,angle){
-            pos.x+=len*Math.cos(angle);
-            pos.y+=len*Math.sin(angle);
-        }
+
         function drawArrow({ to, from }) {
             const tailY = 20;
 
             let toP, fromP;
-            toP=JSON.parse(JSON.stringify(to));
-            fromP=JSON.parse(JSON.stringify(from));
+            toP = JSON.parse(JSON.stringify(to));
+            fromP = JSON.parse(JSON.stringify(from));
 
-            const angle=Math.atan2((toP.y- fromP.y),(toP.x- fromP.x ));
-            let biasY=Math.abs(tailY/Math.tan(angle)*Math.sin(angle));
-            let biasX=Math.abs(tailY/Math.tan(angle)*Math.cos(angle));
+            const angle = Math.atan2((toP.y - fromP.y), (toP.x - fromP.x));
 
-            const ratio=(biasY+from.height/2)/biasY;
-            makeBias(fromP,Math.abs(tailY/Math.tan(angle)*ratio),angle);
+            function getLine1() {                
+                let biasY = Math.abs(tailY / Math.tan(angle) * Math.sin(angle));
+
+                const ratio = (biasY + from.height / 2) / biasY;
+                return Math.abs(tailY / Math.tan(angle) * ratio);
+            }
+            function getLine2(){
+                const X=fromP.height/2/Math.abs(Math.cos(angle));
+                const ratio=(fromP.width/2+Math.abs(Math.sin(angle)*X))/X;
+                return fromP.height/2*ratio;
+            }
+            function getLine3(){
+                let biasY = Math.abs(tailY * Math.tan(angle) * Math.cos(angle));
+
+                const ratio = (biasY + from.width / 2) / biasY;
+                return Math.abs(tailY * Math.tan(angle) * ratio);
+            }
+            makeBias(fromP, Math.min(getLine1(),getLine2(),getLine3()), angle);
 
 
 
-            ctx.translate(toP.x, toP.y );
-            ctx.rotate(Math.PI+angle)
+            ctx.translate(toP.x, toP.y);
+            ctx.rotate(Math.PI + angle)
             ctx.beginPath();
             ctx.lineWidth = 3;
             // ctx.lineTo(from.x+from.width/2,from.y+from.height/2);
@@ -74,8 +89,8 @@ class Fdtd {
             const y1 = 20;
             const x2 = 25;
             const y2 = 5;
-            
-            const tailX = sumSqrt(toP.x - fromP.x , toP.y - fromP.y );
+
+            const tailX = sumSqrt(toP.x - fromP.x, toP.y - fromP.y);
             ctx.moveTo(0, 0);
             ctx.lineTo(x1, y1);
             ctx.lineTo(x2, y2);
@@ -94,6 +109,6 @@ class Fdtd {
             ctx.stroke();
         }
         drawArrow(arrowRect);
-        this.preArrowRect= arrowRect;        
+        this.preArrowRect = arrowRect;
     }
 }
