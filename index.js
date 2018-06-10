@@ -1,18 +1,21 @@
-function squareSumSqrt(a, b) {
+export function squareSumSqrt(a, b) {
     return Math.sqrt(a * a + b * b);
 }
-function getBoundingRect(dom) {
+export function getBoundingRect(dom) {
     const rect = dom.getBoundingClientRect();
     rect.x += rect.width / 2;
     rect.y += rect.height / 2;
     return rect;
 }
-function makeBias(pos, len, angle) {
+export function makeBias(pos, len, angle) {
     pos.x += len * Math.cos(angle);
     pos.y += len * Math.sin(angle);
 }
-class Fdtd {
-    constructor({ from, to }) {
+export default class D2D {
+    constructor({ from, to ,arrowOptions}={}) {
+        this.arrowOptions=Object.assign({
+            strokeStyle:'#555',
+        },arrowOptions);
         const canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
         canvas.style = "position:fixed;left:0;right:0;top:0;bottom:0;height:100%;width:100%;pointer-events:none;"
@@ -30,7 +33,14 @@ class Fdtd {
         this.ctx = ctx;
         this.update();
     }
+    destroy(){
+        document.body.removeChild(this.canvas);
+        this.destroyed=true;
+    }
     update() {
+        if(this.destroyed){
+            return ;
+        }
         this.draw();
         requestAnimationFrame(this.update.bind(this));
     }
@@ -98,7 +108,7 @@ class Fdtd {
             makeBias(fromP, Math.min(getLineWidth(),getLineCorner(),getLineHeight()), angle);
             makeBias(toP,getTargetDis(),Math.PI+angle);
 
-
+            ctx.strokeStyle=this.arrowOptions.strokeStyle;
             ctx.translate(toP.x, toP.y);
             ctx.rotate(Math.PI + angle)
             ctx.beginPath();

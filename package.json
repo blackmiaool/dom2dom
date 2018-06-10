@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/blackmiaool/from-dom-to-dom/issues"
   },
-  "homepage": "https://github.com/blackmiaool/from-dom-to-dom#readme"
+  "homepage": "https://github.com/blackmiaool/from-dom-to-dom#readme",
+  "devDependencies": {
+    "microbundle": "^0.4.4"
+  }
 }
