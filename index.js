@@ -1,4 +1,4 @@
-function sumSqrt(a, b) {
+function squareSumSqrt(a, b) {
     return Math.sqrt(a * a + b * b);
 }
 function getBoundingRect(dom) {
@@ -55,28 +55,48 @@ class Fdtd {
             let toP, fromP;
             toP = JSON.parse(JSON.stringify(to));
             fromP = JSON.parse(JSON.stringify(from));
-
+            
             const angle = Math.atan2((toP.y - fromP.y), (toP.x - fromP.x));
+            const tan=Math.tan(angle);
+            const sin=Math.sin(angle);
+            const cos=Math.cos(angle);
+            
+            function getLineWidth() {     
+                const h=fromP.height/2;
+                const w=fromP.width/2;           
+                let biasY = Math.abs(tailY / tan * sin);
 
-            function getLine1() {                
-                let biasY = Math.abs(tailY / Math.tan(angle) * Math.sin(angle));
-
-                const ratio = (biasY + from.height / 2) / biasY;
-                return Math.abs(tailY / Math.tan(angle) * ratio);
+                const ratio = (biasY + h) / biasY;
+                return Math.abs(tailY / tan * ratio);
             }
-            function getLine2(){
-                const X=fromP.height/2/Math.abs(Math.cos(angle));
-                const ratio=(fromP.width/2+Math.abs(Math.sin(angle)*X))/X;
-                return fromP.height/2*ratio;
-            }
-            function getLine3(){
-                let biasY = Math.abs(tailY * Math.tan(angle) * Math.cos(angle));
+            function getLineCorner(){
+                const h=fromP.height/2;
+                const w=fromP.width/2; 
 
-                const ratio = (biasY + from.width / 2) / biasY;
-                return Math.abs(tailY * Math.tan(angle) * ratio);
+                const X=h/Math.abs(cos);
+                const ratio=(w+Math.abs(sin*X))/X;
+                return h*ratio;
             }
-            makeBias(fromP, Math.min(getLine1(),getLine2(),getLine3()), angle);
+            function getLineHeight(){
+                let biasX = Math.abs(tailY * tan * cos);
 
+                const ratio = (biasX + from.width / 2) / biasX;
+                return Math.abs(tailY * tan * ratio);
+            }
+
+            function getTargetDis(){
+                const h=toP.height/2;
+                const w=toP.width/2;
+                const angles=[Math.atan2(h,w),Math.atan2(h,-w),Math.atan2(-h,-w),Math.atan2(-h,w)];
+
+                if((angle>=angles[0]&&angle<angles[1])||(angle>=angles[2]&&angle<angles[3])){
+                    return Math.abs(h/sin);
+                }else{
+                    return Math.abs(w/cos);
+                }
+            }
+            makeBias(fromP, Math.min(getLineWidth(),getLineCorner(),getLineHeight()), angle);
+            makeBias(toP,getTargetDis(),Math.PI+angle);
 
 
             ctx.translate(toP.x, toP.y);
@@ -90,7 +110,7 @@ class Fdtd {
             const x2 = 25;
             const y2 = 5;
 
-            const tailX = sumSqrt(toP.x - fromP.x, toP.y - fromP.y);
+            const tailX = squareSumSqrt(toP.x - fromP.x, toP.y - fromP.y);
             ctx.moveTo(0, 0);
             ctx.lineTo(x1, y1);
             ctx.lineTo(x2, y2);
