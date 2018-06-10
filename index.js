@@ -15,6 +15,7 @@ export default class D2D {
     constructor({ from, to ,arrowOptions}={}) {
         this.arrowOptions=Object.assign({
             strokeStyle:'#555',
+            lineWidth:3,
         },arrowOptions);
         const canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
@@ -58,87 +59,88 @@ export default class D2D {
         canvas.height = document.documentElement.offsetHeight;
         canvas.width = document.documentElement.offsetWidth;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        function drawArrow({ to, from }) {
-            const tailY = 20;
-
-            let toP, fromP;
-            toP = JSON.parse(JSON.stringify(to));
-            fromP = JSON.parse(JSON.stringify(from));
-            
-            const angle = Math.atan2((toP.y - fromP.y), (toP.x - fromP.x));
-            const tan=Math.tan(angle);
-            const sin=Math.sin(angle);
-            const cos=Math.cos(angle);
-            
-            function getLineWidth() {     
-                const h=fromP.height/2;
-                const w=fromP.width/2;           
-                let biasY = Math.abs(tailY / tan * sin);
-
-                const ratio = (biasY + h) / biasY;
-                return Math.abs(tailY / tan * ratio);
-            }
-            function getLineCorner(){
-                const h=fromP.height/2;
-                const w=fromP.width/2; 
-
-                const X=h/Math.abs(cos);
-                const ratio=(w+Math.abs(sin*X))/X;
-                return h*ratio;
-            }
-            function getLineHeight(){
-                let biasX = Math.abs(tailY * tan * cos);
-
-                const ratio = (biasX + from.width / 2) / biasX;
-                return Math.abs(tailY * tan * ratio);
-            }
-
-            function getTargetDis(){
-                const h=toP.height/2;
-                const w=toP.width/2;
-                const angles=[Math.atan2(h,w),Math.atan2(h,-w),Math.atan2(-h,-w),Math.atan2(-h,w)];
-
-                if((angle>=angles[0]&&angle<angles[1])||(angle>=angles[2]&&angle<angles[3])){
-                    return Math.abs(h/sin);
-                }else{
-                    return Math.abs(w/cos);
-                }
-            }
-            makeBias(fromP, Math.min(getLineWidth(),getLineCorner(),getLineHeight()), angle);
-            makeBias(toP,getTargetDis(),Math.PI+angle);
-
-            ctx.strokeStyle=this.arrowOptions.strokeStyle;
-            ctx.translate(toP.x, toP.y);
-            ctx.rotate(Math.PI + angle)
-            ctx.beginPath();
-            ctx.lineWidth = 3;
-            // ctx.lineTo(from.x+from.width/2,from.y+from.height/2);
-            // ctx.lineTo(to.x+to.width/2,to.y+to.height/2);
-            const x1 = 30;
-            const y1 = 20;
-            const x2 = 25;
-            const y2 = 5;
-
-            const tailX = squareSumSqrt(toP.x - fromP.x, toP.y - fromP.y);
-            ctx.moveTo(0, 0);
-            ctx.lineTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.moveTo(x2, -y2);
-            ctx.lineTo(x1, -y1);
-            ctx.lineTo(0, 0);
-            ctx.lineTo(x1, y1);
-            ctx.stroke();
-
-
-            ctx.beginPath();
-            ctx.moveTo(x2, y2);
-            ctx.lineTo(tailX, tailY);
-            ctx.lineTo(tailX, -tailY);
-            ctx.lineTo(x2, -y2);
-            ctx.stroke();
-        }
-        drawArrow(arrowRect);
+        
+        this.drawArrow(arrowRect);
         this.preArrowRect = arrowRect;
+    }
+    drawArrow({ to, from }) {
+        const ctx = this.ctx;
+        const tailY = 20;
+
+        let toP, fromP;
+        toP = JSON.parse(JSON.stringify(to));
+        fromP = JSON.parse(JSON.stringify(from));
+        
+        const angle = Math.atan2((toP.y - fromP.y), (toP.x - fromP.x));
+        const tan=Math.tan(angle);
+        const sin=Math.sin(angle);
+        const cos=Math.cos(angle);
+        
+        function getLineWidth() {     
+            const h=fromP.height/2;
+            const w=fromP.width/2;           
+            let biasY = Math.abs(tailY / tan * sin);
+
+            const ratio = (biasY + h) / biasY;
+            return Math.abs(tailY / tan * ratio);
+        }
+        function getLineCorner(){
+            const h=fromP.height/2;
+            const w=fromP.width/2; 
+
+            const X=h/Math.abs(cos);
+            const ratio=(w+Math.abs(sin*X))/X;
+            return h*ratio;
+        }
+        function getLineHeight(){
+            let biasX = Math.abs(tailY * tan * cos);
+
+            const ratio = (biasX + from.width / 2) / biasX;
+            return Math.abs(tailY * tan * ratio);
+        }
+
+        function getTargetDis(){
+            const h=toP.height/2;
+            const w=toP.width/2;
+            const angles=[Math.atan2(h,w),Math.atan2(h,-w),Math.atan2(-h,-w),Math.atan2(-h,w)];
+
+            if((angle>=angles[0]&&angle<angles[1])||(angle>=angles[2]&&angle<angles[3])){
+                return Math.abs(h/sin);
+            }else{
+                return Math.abs(w/cos);
+            }
+        }
+        makeBias(fromP, Math.min(getLineWidth(),getLineCorner(),getLineHeight()), angle);
+        makeBias(toP,getTargetDis(),Math.PI+angle);
+
+        ctx.strokeStyle=this.arrowOptions.strokeStyle;
+        ctx.translate(toP.x, toP.y);
+        ctx.rotate(Math.PI + angle)
+        ctx.beginPath();
+        ctx.lineWidth = this.arrowOptions.lineWidth;
+        // ctx.lineTo(from.x+from.width/2,from.y+from.height/2);
+        // ctx.lineTo(to.x+to.width/2,to.y+to.height/2);
+        const x1 = 30;
+        const y1 = 20;
+        const x2 = 25;
+        const y2 = 5;
+
+        const tailX = squareSumSqrt(toP.x - fromP.x, toP.y - fromP.y);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.moveTo(x2, -y2);
+        ctx.lineTo(x1, -y1);
+        ctx.lineTo(0, 0);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
+
+
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(tailX, tailY);
+        ctx.lineTo(tailX, -tailY);
+        ctx.lineTo(x2, -y2);
+        ctx.stroke();
     }
 }

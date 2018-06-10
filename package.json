@@ -1,21 +1,23 @@
 {
-  "name": "from-dom-to-dom",
+  "name": "dom2dom",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "microbundle -o ./dist --name D2D",
+    "dev": "microbundle watch -o ./dist --name D2D "
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blackmiaool/from-dom-to-dom.git"
+    "url": "git+https://github.com/blackmiaool/dom2domgit"
   },
   "author": "blackmiaool",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/blackmiaool/from-dom-to-dom/issues"
+    "url": "https://github.com/blackmiaool/dom2dom/issues"
   },
-  "homepage": "https://github.com/blackmiaool/from-dom-to-dom#readme",
+  "homepage": "https://github.com/blackmiaool/dom2dom#readme",
   "devDependencies": {
     "microbundle": "^0.4.4"
   }
