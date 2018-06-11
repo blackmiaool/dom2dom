@@ -1,8 +1,8 @@
 {
   "name": "dom2dom",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/dom2dom.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "microbundle -o ./dist --name D2D",
